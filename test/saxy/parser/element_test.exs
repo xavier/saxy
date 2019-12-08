@@ -144,6 +144,20 @@ defmodule Saxy.Parser.ElementTest do
     assert events == []
   end
 
+  test "parses elements with xml:space=\"preserve\"" do
+    buffer = "<foo xml:space=\"preserve\">   </foo>"
+
+    assert {:ok, state} = parse(buffer)
+    events = Enum.reverse(state.user_state)
+
+    assert [{:start_element, {"foo", [{"xml:space", "preserve"}]}} | events] = events
+    assert [{:characters, "   "} | events] = events
+    assert [{:end_element, "foo"} | events] = events
+    assert [{:end_document, {}} | events] = events
+
+    assert events == []
+  end
+
   test "parses comments" do
     buffer = "<foo><!--IGNORE ME--></foo>"
 
